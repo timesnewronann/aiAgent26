@@ -18,6 +18,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Chatbot")
     parser.add_argument("user_prompt", type=str, help="User prompt")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     args = parser.parse_args()
 
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
@@ -26,19 +27,24 @@ def main():
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=messages)
+
     if response.usage_metadata is not None:
         prompt_tokens = response.usage_metadata.prompt_token_count
         candidate_tokens = response.usage_metadata.candidates_token_count
     else:
         raise RuntimeError("Response was empty check your model/api key")
 
-    # display the user prompt
-    print(f"User prompt: {args.user_prompt}")
-    # monitor token consumption
-    print(f"Prompt tokens: {prompt_tokens}")
-    print(f"Response tokens: {candidate_tokens}")
-    # models answer
-    print(f"Response: \n{response.text}")
+    if args.verbose:
+        # display the user prompt
+        print(f"User prompt: {args.user_prompt}")
+        # monitor token consumption
+        print(f"Prompt tokens: {prompt_tokens}")
+        print(f"Response tokens: {candidate_tokens}")
+        # models answer
+        print(f"Response: \n{response.text}")
+    else:
+        # models answer
+        print(f"Response: \n{response.text}")
 
 
 if __name__ == "__main__":
