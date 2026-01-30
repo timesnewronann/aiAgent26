@@ -26,6 +26,18 @@ def write_file(working_directory, file_path, content):
 
         # check if the necessary parent directories of the file path exists
         # Use os.mkdirs()
+        if not valid_target_path:
+            os.makedirs(file_path, exist_ok=True)
+
+        # write into file
+        try:
+            with open(file_path, 'w') as file:
+                file.write(content)
+
+                return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
+
+        except Exception as e:
+            return f"Error: {e}"
 
     except Exception as e:
         return f"Error: {e}"
