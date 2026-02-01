@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 
 def run_python_file(working_directory, file_path, args=None):
@@ -18,7 +19,7 @@ def run_python_file(working_directory, file_path, args=None):
             return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
 
         # if the file path points to an existing directory checked the resolved path
-        if os.path.isfile(target_path):
+        if not os.path.isfile(target_path):
             return f'Error: "{file_path}" does not exist or is not a regular file'
 
         # check if the file path doesn't end with .py
@@ -26,10 +27,31 @@ def run_python_file(working_directory, file_path, args=None):
             return f'Error: "{file_path}" is not a Python file'
 
         # use a subprocess to run the file use this command to run
-        command = ["python", absolute_path]
+        command = ["python", target_path]
 
-        # if there are any extra args add them to the commands list
-        command.extend(args)
+        # if there are any extra args add them to the commands list, if args is empty this should cause an issue maybe check if args is not empty
+        if args != None:
+            command.extend(args)
+
+        completedProcess = subprocess.run(command, cwd=absolute_path,
+                                          capture_output=True, text=True, timeout=30)
+
+        # use a list to handle the output
+        output_parts = []
+
+        if completedProcess.returncode != 0:
+            output_parts.append(f"Process exited with code {completedProcess.returncode}")
+
+        if not completedProcess.stdout and not completedProcess.stderr:
+            output_parts.append("No output produced")
+
+        if completedProcess.stdout:
+            output_parts.append("STDOUT:\n" + completedProcess.stdout)
+
+        if completedProcess.stderr:
+            output_parts.append("STDERR:\n" + completedProcess.stderr)
+
+        return "\n".join(output_parts)
 
     except Exception as e:
-        return f"Error: {e}"
+        return f"Error: executing Python file: {e}"
