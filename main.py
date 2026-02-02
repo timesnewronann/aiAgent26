@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import argparse
+from prompts import system_prompt
 
 
 def main():
@@ -26,7 +27,9 @@ def main():
     # agent response buildingbootdev run 3d695968-98c9-4a91-b1e2-0ca53e8826b7
     response = client.models.generate_content(
         model='gemini-2.5-flash',
-        contents=messages)
+        contents=messages,
+        config=types.GenerateContentConfig(system_instruction=system_prompt, temperature=0)
+    )
 
     if response.usage_metadata is not None:
         prompt_tokens = response.usage_metadata.prompt_token_count
