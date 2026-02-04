@@ -4,6 +4,7 @@ from google import genai
 from google.genai import types
 import argparse
 from prompts import system_prompt
+from functions.call_function import available_functions
 
 
 def main():
@@ -28,7 +29,8 @@ def main():
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=messages,
-        config=types.GenerateContentConfig(system_instruction=system_prompt, temperature=0)
+        config=types.GenerateContentConfig(
+            tools=[available_functions], system_instruction=system_prompt, temperature=0)
     )
 
     if response.usage_metadata is not None:
