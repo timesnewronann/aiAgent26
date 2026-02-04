@@ -45,8 +45,11 @@ def main():
         # monitor token consumption
         print(f"Prompt tokens: {prompt_tokens}")
         print(f"Response tokens: {candidate_tokens}")
-        # models answer
-        print(f"Response: \n{response.text}")
+
+    if response.function_calls is not None:
+        for function_call in response.function_calls:
+            # use function call.name and function_call.args
+            print(f"Calling function: {function_call.name}({function_call.args})")
     else:
         # models answer
         print(f"Response: \n{response.text}")
