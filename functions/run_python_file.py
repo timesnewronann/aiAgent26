@@ -1,5 +1,21 @@
 import os
 import subprocess
+from google import genai
+from google.genai import types
+
+schema_get_files_content = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Runs the python file and checks if the file is not a python file",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Checks if the file_path is a valid Python file and has guardrails to check if the target_path is in a valid directory",
+            ),
+        },
+    ),
+)
 
 
 def run_python_file(working_directory, file_path, args=None):
