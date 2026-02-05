@@ -14,6 +14,7 @@ schema_get_files_content = types.FunctionDeclaration(
                 description="Checks if the file_path is a valid Python file and has guardrails to check if the target_path is in a valid directory",
             ),
         },
+        required=["file_path"],
     ),
 )
 

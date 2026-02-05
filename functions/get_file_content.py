@@ -3,17 +3,18 @@ from config import MAX_CHARS
 from google import genai
 from google.genai import types
 
-schema_get_files_content = types.FunctionDeclaration(
-    name="get_files_content",
-    description="Lists files content and checks if the file exceeds the limit",
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Reads file content, checks if the file exceeds the limit, then returns the file content with truncation note if needed",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="Reads the content of a file and checks if the file reading exceeded the max limit of characters",
+                description="Relative path of the file to read, from the working directory.",
             ),
         },
+        required=["file_path"],
     ),
 )
 
