@@ -3,16 +3,24 @@ import subprocess
 from google import genai
 from google.genai import types
 
-schema_get_files_content = types.FunctionDeclaration(
+schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
     description="Runs the python file and checks if the file is not a python file",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="Checks if the file_path is a valid Python file and has guardrails to check if the target_path is in a valid directory",
+                description="Relative path of the file to read, from the working directory.",
             ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                items=types.Schema(
+                    type=types.Type.STRING,
+                    description="A single command-line argument to pass to the Python file.",
+                ),
+                description="Optional list of command line arguments to pass to the Python file.",
+            )
         },
         required=["file_path"],
     ),

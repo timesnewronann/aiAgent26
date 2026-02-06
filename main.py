@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types
+from google.genai import types, errors
 import argparse
 from prompts import system_prompt
 from functions.call_function import available_functions
@@ -26,12 +26,16 @@ def main():
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
 
     # agent response buildingbootdev run 3d695968-98c9-4a91-b1e2-0ca53e8826b7
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions], system_instruction=system_prompt, temperature=0)
-    )
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions], system_instruction=system_prompt, temperature=0)
+        )
+    except errors.ClientError as e:
+        print(f"API error: {e}")
+        return  # main() ends, exit code is still 0
 
     if response.usage_metadata is not None:
         prompt_tokens = response.usage_metadata.prompt_token_count
