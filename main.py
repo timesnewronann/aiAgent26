@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types, errors
 import argparse
 from prompts import system_prompt
-from functions.call_function import available_functions
+from functions.call_function import available_functions, call_function
 
 
 def main():
@@ -51,9 +51,42 @@ def main():
         print(f"Response tokens: {candidate_tokens}")
 
     if response.function_calls is not None:
+        function_results = []
         for function_call in response.function_calls:
             # use function call.name and function_call.args
-            print(f"Calling function: {function_call.name}({function_call.args})")
+            # print(f"Calling function: {function_call.name}({function_call.args})")
+
+            # use call_function
+            function_call_result = call_function(function_call, verbose=args.verbose)
+
+            # Defensive checks step by step
+            # 1. Parts must exist and not be empty
+            if not function_call_result.parts:
+                raise Exception("No parts in function_call_result")
+
+            first_part = function_call_result.parts[0]
+
+            # 2. function_response must nt be None
+            if first_part.function_response is None:
+                raise Exception("No function_response in first_part")
+
+            func_response = first_part.function_response
+
+            # 3. response field must not be None
+            if func_response.response is None:
+                raise Exception("No response in function_response")
+
+            # Extract the actual "result" string from the dict
+            result_dict = func_response.response
+
+            # 4. Save the part for later use
+            function_results.append(first_part)
+
+            # 5. If verbose, print the response dict
+            if args.verbose:
+                # assuming the key is "result" per your call_function
+                print(f"-> {result_dict['result']}")
+
     else:
         # models answer
         print(f"Response: \n{response.text}")
